@@ -39,7 +39,7 @@ class TestConfigWizard:
         wizard = ConfigWizard()
         result = wizard._validate_optional_path("/nonexistent/file.txt")
         assert isinstance(result, str)
-        assert "no existe" in result
+        assert "does not exist" in result
 
     @patch("config.wizard.Path.is_file")
     @patch("config.wizard.Path.exists")
@@ -50,7 +50,7 @@ class TestConfigWizard:
         wizard = ConfigWizard()
         result = wizard._validate_optional_path("/some/directory")
         assert isinstance(result, str)
-        assert "no es un archivo válido" in result
+        assert "is not a valid file" in result
 
     @patch("config.wizard.Path.is_file")
     @patch("config.wizard.Path.exists")

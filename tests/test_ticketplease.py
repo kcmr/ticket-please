@@ -75,5 +75,5 @@ def test_run_interactive_flow_wizard_cancelled():
 
         # Verify cancellation message was printed
         calls = mock_console.print.call_args_list
-        cancel_messages = [call for call in calls if "cancelada" in str(call)]
+        cancel_messages = [call for call in calls if "cancelled" in str(call)]
         assert len(cancel_messages) >= 1

@@ -19,10 +19,10 @@ def run_interactive_flow() -> None:
             wizard = ConfigWizard()
             wizard.run()
         except KeyboardInterrupt:
-            console.print("\n❌ Configuración cancelada. Saliendo...")
+            console.print("\n❌ Configuration cancelled. Exiting...")
             return
         except Exception as e:
-            console.print(f"\n❌ Error en la configuración: {e}")
+            console.print(f"\n❌ Configuration error: {e}")
             return
 
     console.print(Text("🎫 Welcome to TicketPlease!", style="bold blue"))
