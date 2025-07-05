@@ -23,7 +23,7 @@ test: ## Run tests with pytest
 	uv run pytest
 
 test-cov: ## Run tests with coverage
-	uv run pytest --cov=src/ticketplease --cov-report=term-missing
+	uv run pytest --cov=src/cli --cov=src/services --cov-report=term-missing
 
 check: format lint test ## Run all checks (format, lint, test)
 

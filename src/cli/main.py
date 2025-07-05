@@ -4,7 +4,7 @@ import typer
 from rich.console import Console
 from rich.text import Text
 
-from ticketplease import __version__
+__version__ = "0.1.0"
 
 app = typer.Typer(
     name="tkp",

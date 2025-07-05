@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from ticketplease.utils import (
+from cli.utils import (
     copy_to_clipboard,
     format_acceptance_criteria,
     format_definition_of_done,
@@ -77,14 +77,14 @@ class TestUtils:
             # Cleanup
             Path(tmp_file.name).unlink()
 
-    @patch("ticketplease.utils.pyperclip.copy")
+    @patch("cli.utils.pyperclip.copy")
     def test_copy_to_clipboard_success(self, mock_copy) -> None:
         """Test successful clipboard copy."""
         result = copy_to_clipboard("test text")
         assert result is True
         mock_copy.assert_called_once_with("test text")
 
-    @patch("ticketplease.utils.pyperclip.copy")
+    @patch("cli.utils.pyperclip.copy")
     def test_copy_to_clipboard_failure(self, mock_copy) -> None:
         """Test clipboard copy failure."""
         mock_copy.side_effect = Exception("Clipboard error")

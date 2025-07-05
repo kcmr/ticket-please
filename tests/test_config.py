@@ -3,7 +3,7 @@
 from pathlib import Path
 from unittest.mock import patch
 
-from ticketplease.config import Config
+from services.config import Config
 
 
 class TestConfig:
@@ -28,7 +28,7 @@ class TestConfig:
         assert default_config["llm"]["model"] == "gpt-4o-mini"
         assert default_config["preferences"]["default_output_language"] == "es"
 
-    @patch("ticketplease.config.Path.exists")
+    @patch("services.config.Path.exists")
     def test_load_without_existing_file(self, mock_exists) -> None:
         """Test loading config when file doesn't exist."""
         mock_exists.return_value = False
