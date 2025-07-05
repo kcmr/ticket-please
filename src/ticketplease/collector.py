@@ -131,7 +131,7 @@ class TaskDataCollector:
             choices=[
                 "📝 Enter manually",
                 "📁 Load from file",
-                "⏭️  Skip (no criteria)",
+                "🤖 Skip (AI will generate automatically)",
             ],
         ).ask()
 
@@ -172,7 +172,7 @@ class TaskDataCollector:
             choices=[
                 "📝 Enter manually",
                 "📁 Load from file",
-                "⏭️  Skip (no DoD)",
+                "🤖 Skip (AI will generate automatically)",
             ],
         ).ask()
 

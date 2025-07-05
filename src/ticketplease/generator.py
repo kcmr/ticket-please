@@ -147,7 +147,7 @@ class TaskGenerator:
     def _refine_description(self, ai_service: AIService, current_description: str) -> str:
         """Refine the current description based on user feedback."""
         refinement_request = questionary.text(
-            "What would you like to change or add?",
+            "What would you like to change or add? (e.g., translate parts to another language)",
             validate=lambda x: bool(x.strip()) or "Refinement request cannot be empty",
         ).ask()
 
