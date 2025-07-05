@@ -1,7 +1,6 @@
 """Main orchestrator for TicketPlease application."""
 
 from rich.console import Console
-from rich.text import Text
 
 from config.service import Config
 from config.wizard import ConfigWizard
@@ -9,8 +8,8 @@ from config.wizard import ConfigWizard
 console = Console()
 
 
-def run_interactive_flow() -> None:
-    """Run the interactive task generation flow."""
+def run_wizard() -> None:
+    """Run the configuration wizard."""
     config = Config()
 
     # Check if configuration is needed
@@ -25,6 +24,32 @@ def run_interactive_flow() -> None:
             console.print(f"\n❌ Configuration error: {e}")
             return
 
-    console.print(Text("🎫 Welcome to TicketPlease!", style="bold blue"))
-    console.print("Starting interactive task generation...")
-    console.print("This feature is coming soon!")
+
+def run_config_update() -> None:
+    """Run the configuration update flow."""
+    config = Config()
+
+    # Check if configuration exists
+    if config.is_first_run():
+        console.print("[yellow]No configuration found. Launching initial setup wizard...[/yellow]")
+        console.print()
+        try:
+            wizard = ConfigWizard()
+            wizard.run()
+        except KeyboardInterrupt:
+            console.print("\n❌ Configuration cancelled.")
+            return
+        except Exception as e:
+            console.print(f"\n❌ Configuration error: {e}")
+            return
+        return
+
+    try:
+        wizard = ConfigWizard()
+        wizard.run_update()
+    except KeyboardInterrupt:
+        console.print("\n❌ Configuration update cancelled.")
+        return
+    except Exception as e:
+        console.print(f"\n❌ Configuration update error: {e}")
+        return

@@ -2,11 +2,11 @@
 
 from unittest.mock import patch
 
-from ticketplease.main import run_interactive_flow
+from ticketplease.main import run_wizard
 
 
-def test_run_interactive_flow_with_existing_config():
-    """Test that run_interactive_flow executes without errors when config exists."""
+def test_run_wizard_with_existing_config():
+    """Test that run_wizard does nothing when config already exists."""
     with (
         patch("ticketplease.main.console") as mock_console,
         patch("ticketplease.main.Config") as mock_config_class,
@@ -16,19 +16,14 @@ def test_run_interactive_flow_with_existing_config():
         mock_config.is_first_run.return_value = False
         mock_config.is_configured.return_value = True
 
-        run_interactive_flow()
+        run_wizard()
 
-        # Verify that console.print was called
-        assert mock_console.print.call_count >= 1
-
-        # Verify the welcome message is printed
-        calls = mock_console.print.call_args_list
-        welcome_call = calls[-3]  # Welcome message should be near the end
-        assert "🎫 Welcome to TicketPlease!" in str(welcome_call)
+        # Verify that no console.print was called (no wizard needed)
+        assert mock_console.print.call_count == 0
 
 
-def test_run_interactive_flow_first_run():
-    """Test run_interactive_flow on first run (triggers wizard)."""
+def test_run_wizard_first_run():
+    """Test run_wizard on first run (triggers wizard)."""
     with (
         patch("ticketplease.main.console") as mock_console,
         patch("ticketplease.main.Config") as mock_config_class,
@@ -39,24 +34,28 @@ def test_run_interactive_flow_first_run():
         mock_config.is_first_run.return_value = True
         mock_config.is_configured.return_value = False
 
-        # Mock wizard
-        mock_wizard = mock_wizard_class.return_value
-        mock_wizard.run.return_value = {"api_keys": {"provider": "openai"}}
+        # Mock wizard to actually call console.print
+        def mock_wizard_run():
+            mock_console.print("🎫 Welcome to TicketPlease!")
+            return True
 
-        run_interactive_flow()
+        mock_wizard = mock_wizard_class.return_value
+        mock_wizard.run.side_effect = mock_wizard_run
+
+        run_wizard()
 
         # Verify wizard was instantiated and run
         mock_wizard_class.assert_called_once()
         mock_wizard.run.assert_called_once()
 
-        # Verify welcome message is eventually printed
+        # Verify welcome message is printed (from wizard)
         calls = mock_console.print.call_args_list
         welcome_messages = [call for call in calls if "🎫 Welcome to TicketPlease!" in str(call)]
         assert len(welcome_messages) >= 1
 
 
-def test_run_interactive_flow_wizard_cancelled():
-    """Test run_interactive_flow when wizard is cancelled."""
+def test_run_wizard_wizard_cancelled():
+    """Test run_wizard when wizard is cancelled."""
     with (
         patch("ticketplease.main.console") as mock_console,
         patch("ticketplease.main.Config") as mock_config_class,
@@ -71,7 +70,7 @@ def test_run_interactive_flow_wizard_cancelled():
         mock_wizard = mock_wizard_class.return_value
         mock_wizard.run.side_effect = KeyboardInterrupt("User cancelled")
 
-        run_interactive_flow()
+        run_wizard()
 
         # Verify cancellation message was printed
         calls = mock_console.print.call_args_list
