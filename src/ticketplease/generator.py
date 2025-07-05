@@ -4,8 +4,8 @@ from typing import Any
 
 import questionary
 from rich.console import Console
-from rich.markdown import Markdown
 from rich.panel import Panel
+from rich.syntax import Syntax
 
 from ai.service import AIService
 from config.service import Config
@@ -95,7 +95,7 @@ class TaskGenerator:
 
             if action == "✅ Accept and copy to clipboard":
                 return self._copy_and_finish(description)
-            elif action == "🔄 Refine description":
+            elif action == "🔄 Make changes":
                 description = self._refine_description(ai_service, description)
                 if not description:  # Refinement failed
                     return False
@@ -115,9 +115,9 @@ class TaskGenerator:
         )
         console.print()
 
-        # Display as markdown for better formatting
-        markdown = Markdown(description)
-        console.print(markdown)
+        # Display the content with markdown syntax highlighting
+        syntax = Syntax(description, "markdown", theme="monokai", line_numbers=False, padding=2)
+        console.print(syntax)
         console.print("\n" + "=" * 80)
 
     def _get_user_action(self) -> str | None:
@@ -126,7 +126,7 @@ class TaskGenerator:
             "What would you like to do?",
             choices=[
                 "✅ Accept and copy to clipboard",
-                "🔄 Refine description",
+                "🔄 Make changes",
                 "❌ Cancel",
             ],
         ).ask()
