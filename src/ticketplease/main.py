@@ -5,6 +5,8 @@ from rich.console import Console
 from config.service import Config
 from config.wizard import ConfigWizard
 
+from .generator import TaskGenerator
+
 console = Console()
 
 
@@ -28,10 +30,15 @@ def run_config(is_update: bool = False) -> None:
         except Exception as e:
             console.print(f"\n❌ Configuration error: {e}")
             return
+
+        # After successful initial setup, start task generation
+        if not is_update:
+            run_task_generation()
         return
 
-    # If this is not an update, we don't need to do anything
+    # If this is not an update, start task generation
     if not is_update:
+        run_task_generation()
         return
 
     try:
@@ -43,3 +50,10 @@ def run_config(is_update: bool = False) -> None:
     except Exception as e:
         console.print(f"\n❌ Configuration update error: {e}")
         return
+
+
+def run_task_generation() -> None:
+    """Run the task generation flow."""
+    config = Config()
+    generator = TaskGenerator(config)
+    generator.generate_task()
