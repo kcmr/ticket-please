@@ -152,7 +152,7 @@ class TestIntegration:
 
         # Setup user interaction mocks - first refine, then accept
         mock_select.return_value.ask.side_effect = [
-            "🔄 Refine description",
+            "🔄 Make changes",
             "✅ Accept and copy to clipboard",
         ]
         mock_text.return_value.ask.return_value = "Make it shorter"

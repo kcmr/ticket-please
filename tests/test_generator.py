@@ -180,11 +180,11 @@ class TestTaskGenerator:
     @patch("questionary.select")
     def test_get_user_action_refine(self, mock_select, generator):
         """Test user action selection - refine."""
-        mock_select.return_value.ask.return_value = "🔄 Refine description"
+        mock_select.return_value.ask.return_value = "🔄 Make changes"
 
         result = generator._get_user_action()
 
-        assert result == "🔄 Refine description"
+        assert result == "🔄 Make changes"
 
     @patch("questionary.select")
     def test_get_user_action_cancel(self, mock_select, generator):
@@ -283,7 +283,7 @@ class TestTaskGenerator:
         """Test result handling with refinement then accept."""
         # First call returns refine, second call returns accept
         mock_select.return_value.ask.side_effect = [
-            "🔄 Refine description",
+            "🔄 Make changes",
             "✅ Accept and copy to clipboard",
         ]
 
