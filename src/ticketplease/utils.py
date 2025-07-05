@@ -1,5 +1,6 @@
 """Utility functions for TicketPlease."""
 
+import os
 from pathlib import Path
 
 import pyperclip
@@ -14,10 +15,24 @@ def copy_to_clipboard(text: str) -> bool:
         return False
 
 
+def expand_file_path(file_path: str) -> str:
+    """Expand file path to absolute path, handling ~ and relative paths."""
+    if not file_path or not file_path.strip():
+        return ""
+
+    # Expand user home directory (~) and convert to absolute path
+    expanded = os.path.expanduser(file_path.strip())
+    absolute_path = os.path.abspath(expanded)
+    return absolute_path
+
+
 def read_file_content(file_path: str) -> list[str]:
     """Read content from a file and return as list of lines."""
     try:
-        path = Path(file_path)
+        # Expand the path to handle ~ and relative paths
+        expanded_path = expand_file_path(file_path)
+        path = Path(expanded_path)
+
         if not path.exists():
             return []
 
@@ -33,7 +48,9 @@ def read_file_content(file_path: str) -> list[str]:
 def validate_file_path(file_path: str) -> bool:
     """Validate if a file path exists and is readable."""
     try:
-        path = Path(file_path)
+        # Expand the path to handle ~ and relative paths
+        expanded_path = expand_file_path(file_path)
+        path = Path(expanded_path)
         return path.exists() and path.is_file()
     except Exception:
         return False

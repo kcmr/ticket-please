@@ -8,6 +8,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
+from ticketplease.utils import expand_file_path
+
 from .service import Config
 
 console = Console()
@@ -51,8 +53,8 @@ class ConfigWizard:
             ],
         }
         self.languages = {
-            "Español": "es",
             "English": "en",
+            "Español": "es",
         }
         self.platforms = {
             "GitHub": "github",
@@ -180,6 +182,7 @@ class ConfigWizard:
             "Path to Acceptance Criteria file (optional):",
             default="",
             validate=lambda x: self._validate_optional_path(x),
+            only_directories=False,
         ).ask()
 
         if ac_path is None:
@@ -190,17 +193,22 @@ class ConfigWizard:
             "Path to Definition of Done file (optional):",
             default="",
             validate=lambda x: self._validate_optional_path(x),
+            only_directories=False,
         ).ask()
 
         if dod_path is None:
             raise KeyboardInterrupt("Configuration cancelled")
 
+        # Expand paths to absolute paths if provided
+        expanded_ac_path = expand_file_path(ac_path) if ac_path else ""
+        expanded_dod_path = expand_file_path(dod_path) if dod_path else ""
+
         return {
             "preferences": {
                 "default_output_language": language,
                 "default_platform": platform,
-                "default_ac_path": ac_path.strip() if ac_path else "",
-                "default_dod_path": dod_path.strip() if dod_path else "",
+                "default_ac_path": expanded_ac_path,
+                "default_dod_path": expanded_dod_path,
             }
         }
 
@@ -209,7 +217,10 @@ class ConfigWizard:
         if not path or not path.strip():
             return True  # Empty path is valid (optional)
 
-        path_obj = Path(path.strip())
+        # Use the utility function to expand the path
+        expanded_path = expand_file_path(path)
+        path_obj = Path(expanded_path)
+
         if not path_obj.exists():
             return f"File '{path}' does not exist"
 
