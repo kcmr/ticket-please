@@ -20,12 +20,13 @@ def version() -> None:
     console.print(f"TicketPlease version {__version__}")
 
 
-@app.command()
-def main() -> None:
+@app.callback(invoke_without_command=True)
+def main(ctx: typer.Context) -> None:
     """Start the interactive task generation flow."""
-    console.print(Text("🎫 Welcome to TicketPlease!", style="bold blue"))
-    console.print("This feature is coming soon!")
-    console.print("Use 'tkp --help' to see available commands.")
+    if ctx.invoked_subcommand is None:
+        console.print(Text("🎫 Welcome to TicketPlease!", style="bold blue"))
+        console.print("This feature is coming soon!")
+        console.print("Use 'tkp --help' to see available commands.")
 
 
 if __name__ == "__main__":
