@@ -41,20 +41,7 @@ class ConfigWizard:
     def run(self) -> bool:
         """Run the configuration wizard."""
         try:
-            console.print()
-            console.print(
-                Panel.fit(
-                    Text("🎫 Welcome to TicketPlease!", style="bold blue"),
-                    title="[bold]Initial Setup[/bold]",
-                    border_style="blue",
-                )
-            )
-            console.print()
-
-            console.print(
-                "It looks like this is your first time using TicketPlease or your configuration is empty.\n"
-                "We'll guide you through the initial setup.\n"
-            )
+            self._show_welcome_message()
 
             # Collect configuration
             config_data = self._collect_llm_config()
@@ -63,16 +50,7 @@ class ConfigWizard:
             # Save configuration
             self.config.save(config_data)
 
-            console.print()
-            console.print(
-                Panel.fit(
-                    "✅ Configuration completed successfully!",
-                    title="[bold green]Ready[/bold green]",
-                    border_style="green",
-                )
-            )
-            console.print()
-
+            self._show_success_message("Configuration completed successfully!")
             return True
 
         except KeyboardInterrupt:
@@ -82,30 +60,13 @@ class ConfigWizard:
     def run_update(self) -> bool:
         """Run the configuration update wizard."""
         try:
-            console.print()
-            console.print(
-                Panel.fit(
-                    Text("🔧 Update TicketPlease Configuration", style="bold blue"),
-                    title="[bold]Configuration Update[/bold]",
-                    border_style="blue",
-                )
-            )
-            console.print()
+            self._show_update_header()
 
             # Show current configuration
             self._show_current_config()
 
             # Ask what to update
-            update_choice = questionary.select(
-                "What would you like to update?",
-                choices=[
-                    "🤖 AI Provider & Model",
-                    "🌐 Language & Platform",
-                    "📁 File Paths",
-                    "🔄 Update All Settings",
-                    "❌ Cancel",
-                ],
-            ).ask()
+            update_choice = self._get_update_choice()
 
             if not update_choice or update_choice == "❌ Cancel":
                 console.print("\n[yellow]Configuration update cancelled.[/yellow]")
@@ -114,40 +75,89 @@ class ConfigWizard:
             # Load current configuration
             current_config = self.config.load()
 
-            if update_choice == "🤖 AI Provider & Model":
-                llm_config = self._collect_llm_config(current_config)
-                current_config.update(llm_config)
-            elif update_choice == "🌐 Language & Platform":
-                preferences = self._collect_preferences(current_config, include_file_paths=False)
-                current_config.update(preferences)
-            elif update_choice == "📁 File Paths":
-                file_paths = self._collect_file_paths(current_config)
-                current_config.update(file_paths)
-            elif update_choice == "🔄 Update All Settings":
-                config_data = self._collect_llm_config(current_config)
-                config_data.update(
-                    self._collect_preferences(current_config, include_file_paths=True)
-                )
-                current_config = config_data
+            # Process update choice
+            self._process_update_choice(update_choice, current_config)
 
             # Save updated configuration
             self.config.save(current_config)
 
-            console.print()
-            console.print(
-                Panel.fit(
-                    "✅ Configuration updated successfully!",
-                    title="[bold green]Updated[/bold green]",
-                    border_style="green",
-                )
-            )
-            console.print()
-
+            self._show_success_message("Configuration updated successfully!")
             return True
 
         except KeyboardInterrupt:
             console.print("\n[yellow]Configuration update cancelled.[/yellow]")
             return False
+
+    def _show_welcome_message(self) -> None:
+        """Show welcome message for initial setup."""
+        console.print()
+        console.print(
+            Panel.fit(
+                Text("🎫 Welcome to TicketPlease!", style="bold blue"),
+                title="[bold]Initial Setup[/bold]",
+                border_style="blue",
+            )
+        )
+        console.print()
+
+        console.print(
+            "It looks like this is your first time using TicketPlease or your configuration is empty.\n"
+            "We'll guide you through the initial setup.\n"
+        )
+
+    def _show_update_header(self) -> None:
+        """Show header for configuration update."""
+        console.print()
+        console.print(
+            Panel.fit(
+                Text("🔧 Update TicketPlease Configuration", style="bold blue"),
+                title="[bold]Configuration Update[/bold]",
+                border_style="blue",
+            )
+        )
+        console.print()
+
+    def _show_success_message(self, message: str) -> None:
+        """Show success message."""
+        console.print()
+        console.print(
+            Panel.fit(
+                message,
+                title="[bold green]Success[/bold green]",
+                border_style="green",
+            )
+        )
+        console.print()
+
+    def _get_update_choice(self) -> str | None:
+        """Get user's choice for what to update."""
+        return questionary.select(
+            "What would you like to update?",
+            choices=[
+                "🤖 AI Provider & Model",
+                "🌐 Language & Platform",
+                "📁 File Paths",
+                "🔄 Update All Settings",
+                "❌ Cancel",
+            ],
+        ).ask()
+
+    def _process_update_choice(self, update_choice: str, current_config: dict[str, Any]) -> None:
+        """Process the user's update choice."""
+        if update_choice == "🤖 AI Provider & Model":
+            llm_config = self._collect_llm_config(current_config)
+            current_config.update(llm_config)
+        elif update_choice == "🌐 Language & Platform":
+            preferences = self._collect_preferences(current_config, include_file_paths=False)
+            current_config.update(preferences)
+        elif update_choice == "📁 File Paths":
+            file_paths = self._collect_file_paths(current_config)
+            current_config.update(file_paths)
+        elif update_choice == "🔄 Update All Settings":
+            config_data = self._collect_llm_config(current_config)
+            config_data.update(self._collect_preferences(current_config, include_file_paths=True))
+            current_config.clear()
+            current_config.update(config_data)
 
     def _show_current_config(self) -> None:
         """Show current configuration values."""
@@ -178,12 +188,10 @@ class ConfigWizard:
         platform_map = {v: k for k, v in self.platforms.items()}
         return platform_map.get(platform, platform)
 
-    def _collect_llm_config(self, current_config: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Collect LLM configuration from user."""
-        console.print("[bold]AI Provider Configuration[/bold]")
-        console.print("These values are required to generate task descriptions.\n")
-
-        # Get current values
+    def _get_current_llm_values(
+        self, current_config: dict[str, Any] | None = None
+    ) -> tuple[str, str]:
+        """Get current LLM provider and model values."""
         current_provider = (
             current_config.get("api_keys", {}).get("provider", "openai")
             if current_config
@@ -194,8 +202,63 @@ class ConfigWizard:
             if current_config
             else "gpt-4o-mini"
         )
+        return current_provider, current_model
 
-        # Provider selection
+    def _get_current_preference_values(
+        self, current_config: dict[str, Any] | None = None
+    ) -> tuple[str, str]:
+        """Get current preference values."""
+        current_language = (
+            current_config.get("preferences", {}).get("default_output_language", "en")
+            if current_config
+            else "en"
+        )
+        current_platform = (
+            current_config.get("preferences", {}).get("default_platform", "github")
+            if current_config
+            else "github"
+        )
+        return current_language, current_platform
+
+    def _get_current_file_paths(
+        self, current_config: dict[str, Any] | None = None
+    ) -> tuple[str, str]:
+        """Get current file path values."""
+        current_ac_path = (
+            current_config.get("preferences", {}).get("default_ac_path", "")
+            if current_config
+            else ""
+        )
+        current_dod_path = (
+            current_config.get("preferences", {}).get("default_dod_path", "")
+            if current_config
+            else ""
+        )
+        return current_ac_path, current_dod_path
+
+    def _collect_llm_config(self, current_config: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Collect LLM configuration from user."""
+        console.print("[bold]AI Provider Configuration[/bold]")
+        console.print("These values are required to generate task descriptions.\n")
+
+        current_provider, current_model = self._get_current_llm_values(current_config)
+
+        provider = self._collect_provider_selection(current_provider)
+        api_key = self._collect_api_key(provider)
+        model = self._collect_model_selection(provider, current_model)
+
+        return {
+            "api_keys": {
+                "provider": provider,
+                "api_key": api_key.strip(),
+            },
+            "llm": {
+                "model": model,
+            },
+        }
+
+    def _collect_provider_selection(self, current_provider: str) -> str:
+        """Collect provider selection from user."""
         current_provider_display = self._get_provider_display_name(current_provider)
         provider_choice = questionary.select(
             "Which AI provider would you like to use?",
@@ -206,18 +269,23 @@ class ConfigWizard:
         if not provider_choice:
             raise KeyboardInterrupt("Configuration cancelled")
 
-        provider = self.providers[provider_choice]
+        return self.providers[provider_choice]
 
-        # API Key
+    def _collect_api_key(self, provider: str) -> str:
+        """Collect API key from user."""
+        provider_display = self._get_provider_display_name(provider)
         api_key = questionary.password(
-            f"Enter your API Key for {provider_choice}:",
+            f"Enter your API Key for {provider_display}:",
             validate=lambda x: bool(x.strip()) or "API Key cannot be empty",
         ).ask()
 
         if not api_key:
             raise KeyboardInterrupt("Configuration cancelled")
 
-        # Model selection
+        return api_key
+
+    def _collect_model_selection(self, provider: str, current_model: str) -> str:
+        """Collect model selection from user."""
         available_models = self.models[provider]
         default_model = current_model if current_model in available_models else available_models[0]
 
@@ -230,40 +298,33 @@ class ConfigWizard:
         if not model_choice:
             raise KeyboardInterrupt("Configuration cancelled")
 
-        # Handle custom model specification
         if model_choice == "🔧 Specify custom model":
-            console.print()
-            console.print("[bold yellow]Custom Model Specification[/bold yellow]")
-            console.print("Enter the exact model name as supported by your provider.")
-            console.print("Examples:")
-            console.print("  - For OpenAI: gpt-4o-2024-11-20, gpt-4o-mini-2024-07-18")
-            console.print(
-                "  - For Anthropic: claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022"
-            )
-            console.print("  - For Gemini: gemini-1.5-pro-latest, gemini-2.0-flash-exp")
-            console.print("  - For OpenRouter: anthropic/claude-3.5-sonnet, openai/gpt-4o")
-            console.print()
-
-            model = questionary.text(
-                "Enter custom model name:",
-                validate=lambda x: bool(x.strip()) or "Model name cannot be empty",
-                default=current_model if current_model not in available_models else "",
-            ).ask()
-
-            if not model:
-                raise KeyboardInterrupt("Configuration cancelled")
+            return self._handle_custom_model(current_model, available_models)
         else:
-            model = model_choice
+            return model_choice
 
-        return {
-            "api_keys": {
-                "provider": provider,
-                "api_key": api_key.strip(),
-            },
-            "llm": {
-                "model": model,
-            },
-        }
+    def _handle_custom_model(self, current_model: str, available_models: list[str]) -> str:
+        """Handle custom model specification."""
+        console.print()
+        console.print("[bold yellow]Custom Model Specification[/bold yellow]")
+        console.print("Enter the exact model name as supported by your provider.")
+        console.print("Examples:")
+        console.print("  - For OpenAI: gpt-4o-2024-11-20, gpt-4o-mini-2024-07-18")
+        console.print("  - For Anthropic: claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022")
+        console.print("  - For Gemini: gemini-1.5-pro-latest, gemini-2.0-flash-exp")
+        console.print("  - For OpenRouter: anthropic/claude-3.5-sonnet, openai/gpt-4o")
+        console.print()
+
+        model = questionary.text(
+            "Enter custom model name:",
+            validate=lambda x: bool(x.strip()) or "Model name cannot be empty",
+            default=current_model if current_model not in available_models else "",
+        ).ask()
+
+        if not model:
+            raise KeyboardInterrupt("Configuration cancelled")
+
+        return model
 
     def _collect_preferences(
         self, current_config: dict[str, Any] | None = None, include_file_paths: bool = True
@@ -272,43 +333,10 @@ class ConfigWizard:
         console.print("\n[bold]General Preferences[/bold]")
         console.print("These preferences can be modified later for each task.\n")
 
-        # Get current values
-        current_language = (
-            current_config.get("preferences", {}).get("default_output_language", "en")
-            if current_config
-            else "en"
-        )
-        current_platform = (
-            current_config.get("preferences", {}).get("default_platform", "github")
-            if current_config
-            else "github"
-        )
+        current_language, current_platform = self._get_current_preference_values(current_config)
 
-        # Output language
-        current_language_display = self._get_language_display_name(current_language)
-        language_choice = questionary.select(
-            "In which language would you like to generate the descriptions?",
-            choices=list(self.languages.keys()),
-            default=current_language_display,
-        ).ask()
-
-        if not language_choice:
-            raise KeyboardInterrupt("Configuration cancelled")
-
-        language = self.languages[language_choice]
-
-        # Platform
-        current_platform_display = self._get_platform_display_name(current_platform)
-        platform_choice = questionary.select(
-            "What is your primary platform?",
-            choices=list(self.platforms.keys()),
-            default=current_platform_display,
-        ).ask()
-
-        if not platform_choice:
-            raise KeyboardInterrupt("Configuration cancelled")
-
-        platform = self.platforms[platform_choice]
+        language = self._collect_language_selection(current_language)
+        platform = self._collect_platform_selection(current_platform)
 
         # File paths (only if requested)
         if include_file_paths:
@@ -328,24 +356,53 @@ class ConfigWizard:
                 }
             }
 
+    def _collect_language_selection(self, current_language: str) -> str:
+        """Collect language selection from user."""
+        current_language_display = self._get_language_display_name(current_language)
+        language_choice = questionary.select(
+            "In which language would you like to generate the descriptions?",
+            choices=list(self.languages.keys()),
+            default=current_language_display,
+        ).ask()
+
+        if not language_choice:
+            raise KeyboardInterrupt("Configuration cancelled")
+
+        return self.languages[language_choice]
+
+    def _collect_platform_selection(self, current_platform: str) -> str:
+        """Collect platform selection from user."""
+        current_platform_display = self._get_platform_display_name(current_platform)
+        platform_choice = questionary.select(
+            "What is your primary platform?",
+            choices=list(self.platforms.keys()),
+            default=current_platform_display,
+        ).ask()
+
+        if not platform_choice:
+            raise KeyboardInterrupt("Configuration cancelled")
+
+        return self.platforms[platform_choice]
+
     def _collect_file_paths(self, current_config: dict[str, Any] | None = None) -> dict[str, Any]:
         """Collect file paths configuration."""
         console.print("\n[bold]Optional Files[/bold]")
         console.print("You can specify files with default templates (optional):\n")
 
-        # Get current values
-        current_ac_path = (
-            current_config.get("preferences", {}).get("default_ac_path", "")
-            if current_config
-            else ""
-        )
-        current_dod_path = (
-            current_config.get("preferences", {}).get("default_dod_path", "")
-            if current_config
-            else ""
-        )
+        current_ac_path, current_dod_path = self._get_current_file_paths(current_config)
 
-        # Acceptance criteria path
+        ac_path = self._collect_ac_path(current_ac_path)
+        dod_path = self._collect_dod_path(current_dod_path)
+
+        return {
+            "preferences": {
+                "default_ac_path": expand_file_path(ac_path) if ac_path else "",
+                "default_dod_path": expand_file_path(dod_path) if dod_path else "",
+            }
+        }
+
+    def _collect_ac_path(self, current_ac_path: str) -> str:
+        """Collect acceptance criteria file path."""
         ac_path = questionary.path(
             "Path to Acceptance Criteria file (optional):",
             default=current_ac_path,
@@ -356,7 +413,10 @@ class ConfigWizard:
         if ac_path is None:
             raise KeyboardInterrupt("Configuration cancelled")
 
-        # Definition of done path
+        return ac_path
+
+    def _collect_dod_path(self, current_dod_path: str) -> str:
+        """Collect definition of done file path."""
         dod_path = questionary.path(
             "Path to Definition of Done file (optional):",
             default=current_dod_path,
@@ -367,12 +427,7 @@ class ConfigWizard:
         if dod_path is None:
             raise KeyboardInterrupt("Configuration cancelled")
 
-        return {
-            "preferences": {
-                "default_ac_path": expand_file_path(ac_path) if ac_path else "",
-                "default_dod_path": expand_file_path(dod_path) if dod_path else "",
-            }
-        }
+        return dod_path
 
     def _validate_optional_path(self, path: str) -> bool | str:
         """Validate optional file path."""
