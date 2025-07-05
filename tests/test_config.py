@@ -52,6 +52,66 @@ class TestConfig:
 
         assert config.get_provider() == "anthropic"
 
+    def test_get_ac_path(self) -> None:
+        """Test getting acceptance criteria path from config."""
+        config = Config()
+        config._config = {"preferences": {"default_ac_path": "/path/to/ac.md"}}
+
+        assert config.get_ac_path() == "/path/to/ac.md"
+
+    def test_get_dod_path(self) -> None:
+        """Test getting definition of done path from config."""
+        config = Config()
+        config._config = {"preferences": {"default_dod_path": "/path/to/dod.md"}}
+
+        assert config.get_dod_path() == "/path/to/dod.md"
+
+    def test_is_configured_true(self) -> None:
+        """Test is_configured returns True when config is complete."""
+        config = Config()
+        config._config = {
+            "api_keys": {"provider": "openai", "api_key": "sk-test"},
+            "llm": {"model": "gpt-4o-mini"},
+        }
+
+        assert config.is_configured() is True
+
+    def test_is_configured_false_missing_api_key(self) -> None:
+        """Test is_configured returns False when API key is missing."""
+        config = Config()
+        config._config = {
+            "api_keys": {"provider": "openai", "api_key": ""},
+            "llm": {"model": "gpt-4o-mini"},
+        }
+
+        assert config.is_configured() is False
+
+    def test_is_configured_false_missing_provider(self) -> None:
+        """Test is_configured returns False when provider is missing."""
+        config = Config()
+        config._config = {
+            "api_keys": {"provider": "", "api_key": "sk-test"},
+            "llm": {"model": "gpt-4o-mini"},
+        }
+
+        assert config.is_configured() is False
+
+    @patch("config.service.Path.exists")
+    def test_is_first_run_true(self, mock_exists) -> None:
+        """Test is_first_run returns True when config file doesn't exist."""
+        mock_exists.return_value = False
+        config = Config()
+
+        assert config.is_first_run() is True
+
+    @patch("config.service.Path.exists")
+    def test_is_first_run_false(self, mock_exists) -> None:
+        """Test is_first_run returns False when config file exists."""
+        mock_exists.return_value = True
+        config = Config()
+
+        assert config.is_first_run() is False
+
     def test_get_model(self) -> None:
         """Test getting model from config."""
         config = Config()

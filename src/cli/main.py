@@ -2,7 +2,8 @@
 
 import typer
 from rich.console import Console
-from rich.text import Text
+
+from ticketplease.main import run_interactive_flow
 
 from . import __version__
 
@@ -23,10 +24,7 @@ def version() -> None:
 @app.callback(invoke_without_command=True)
 def main(ctx: typer.Context) -> None:
     """Start the interactive task generation flow."""
-    if ctx.invoked_subcommand is None:
-        console.print(Text("🎫 Welcome to TicketPlease!", style="bold blue"))
-        console.print("This feature is coming soon!")
-        console.print("Use 'tkp --help' to see available commands.")
+    run_interactive_flow()
 
 
 if __name__ == "__main__":

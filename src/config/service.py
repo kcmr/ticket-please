@@ -73,3 +73,26 @@ class Config:
         """Get the default platform."""
         config = self.load()
         return config.get("preferences", {}).get("default_platform", "github")  # noqa: E501
+
+    def get_ac_path(self) -> str:
+        """Get the default acceptance criteria path."""
+        config = self.load()
+        return config.get("preferences", {}).get("default_ac_path", "")
+
+    def get_dod_path(self) -> str:
+        """Get the default definition of done path."""
+        config = self.load()
+        return config.get("preferences", {}).get("default_dod_path", "")
+
+    def is_configured(self) -> bool:
+        """Check if the configuration is complete and valid."""
+        config = self.load()
+        api_key = config.get("api_keys", {}).get("api_key", "")
+        provider = config.get("api_keys", {}).get("provider", "")
+        model = config.get("llm", {}).get("model", "")
+
+        return bool(api_key and provider and model)
+
+    def is_first_run(self) -> bool:
+        """Check if this is the first run (no config file exists)."""
+        return not self.config_file.exists()
