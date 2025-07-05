@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from ticketplease.main import run_wizard
+from ticketplease.main import run_config
 
 
 def test_run_wizard_with_existing_config():
@@ -16,7 +16,7 @@ def test_run_wizard_with_existing_config():
         mock_config.is_first_run.return_value = False
         mock_config.is_configured.return_value = True
 
-        run_wizard()
+        run_config(is_update=False)
 
         # Verify that no console.print was called (no wizard needed)
         assert mock_console.print.call_count == 0
@@ -42,7 +42,7 @@ def test_run_wizard_first_run():
         mock_wizard = mock_wizard_class.return_value
         mock_wizard.run.side_effect = mock_wizard_run
 
-        run_wizard()
+        run_config(is_update=False)
 
         # Verify wizard was instantiated and run
         mock_wizard_class.assert_called_once()
@@ -70,7 +70,7 @@ def test_run_wizard_wizard_cancelled():
         mock_wizard = mock_wizard_class.return_value
         mock_wizard.run.side_effect = KeyboardInterrupt("User cancelled")
 
-        run_wizard()
+        run_config(is_update=False)
 
         # Verify cancellation message was printed
         calls = mock_console.print.call_args_list

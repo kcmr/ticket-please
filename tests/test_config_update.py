@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from config.service import Config
 from config.wizard import ConfigWizard
-from ticketplease.main import run_config_update
+from ticketplease.main import run_config
 
 
 class TestConfigUpdate:
@@ -31,7 +31,7 @@ class TestConfigUpdate:
             patch.object(Config, "is_first_run", return_value=True),
             patch.object(Config, "save") as mock_save,
         ):
-            run_config_update()
+            run_config(is_update=True)
 
             # Verify save was called (wizard completed successfully)
             mock_save.assert_called_once()
@@ -70,7 +70,7 @@ class TestConfigUpdate:
             ]
             mock_password.return_value.ask.return_value = "new-api-key"
 
-            run_config_update()
+            run_config(is_update=True)
 
             # Verify save was called
             mock_save.assert_called_once()
@@ -99,7 +99,7 @@ class TestConfigUpdate:
             # Mock user cancellation
             mock_select.return_value.ask.return_value = "❌ Cancel"
 
-            run_config_update()
+            run_config(is_update=True)
 
         captured = capsys.readouterr()
         assert "Configuration update cancelled" in captured.out
@@ -122,7 +122,7 @@ class TestConfigUpdate:
             patch.object(Config, "load", return_value=mock_config),
             patch.object(ConfigWizard, "run_update", side_effect=KeyboardInterrupt),
         ):
-            run_config_update()
+            run_config(is_update=True)
 
         captured = capsys.readouterr()
         assert "Configuration update cancelled" in captured.out
@@ -133,7 +133,7 @@ class TestConfigUpdate:
             patch.object(Config, "is_first_run", return_value=True),
             patch.object(ConfigWizard, "run", side_effect=KeyboardInterrupt),
         ):
-            run_config_update()
+            run_config(is_update=True)
 
         captured = capsys.readouterr()
         assert "No configuration found. Launching initial setup wizard" in captured.out

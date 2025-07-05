@@ -3,7 +3,7 @@
 import typer
 from rich.console import Console
 
-from ticketplease.main import run_config_update, run_wizard
+from ticketplease.main import run_config
 
 from . import __version__
 
@@ -24,14 +24,14 @@ def version() -> None:
 @app.command()
 def config() -> None:
     """Modify your TicketPlease configuration."""
-    run_config_update()
+    run_config(is_update=True)
 
 
 @app.callback(invoke_without_command=True)
 def main(ctx: typer.Context) -> None:
     """Start the interactive task generation flow."""
     if ctx.invoked_subcommand is None:
-        run_wizard()
+        run_config(is_update=False)
 
 
 if __name__ == "__main__":

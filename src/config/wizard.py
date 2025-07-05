@@ -118,14 +118,16 @@ class ConfigWizard:
                 llm_config = self._collect_llm_config(current_config)
                 current_config.update(llm_config)
             elif update_choice == "🌐 Language & Platform":
-                preferences = self._collect_preferences(current_config)
+                preferences = self._collect_preferences(current_config, include_file_paths=False)
                 current_config.update(preferences)
             elif update_choice == "📁 File Paths":
                 file_paths = self._collect_file_paths(current_config)
                 current_config.update(file_paths)
             elif update_choice == "🔄 Update All Settings":
                 config_data = self._collect_llm_config(current_config)
-                config_data.update(self._collect_preferences(current_config))
+                config_data.update(
+                    self._collect_preferences(current_config, include_file_paths=True)
+                )
                 current_config = config_data
 
             # Save updated configuration
@@ -263,7 +265,9 @@ class ConfigWizard:
             },
         }
 
-    def _collect_preferences(self, current_config: dict[str, Any] | None = None) -> dict[str, Any]:
+    def _collect_preferences(
+        self, current_config: dict[str, Any] | None = None, include_file_paths: bool = True
+    ) -> dict[str, Any]:
         """Collect user preferences."""
         console.print("\n[bold]General Preferences[/bold]")
         console.print("These preferences can be modified later for each task.\n")
@@ -306,16 +310,23 @@ class ConfigWizard:
 
         platform = self.platforms[platform_choice]
 
-        # File paths
-        file_paths = self._collect_file_paths(current_config)
-
-        return {
-            "preferences": {
-                "default_output_language": language,
-                "default_platform": platform,
-                **file_paths["preferences"],
+        # File paths (only if requested)
+        if include_file_paths:
+            file_paths = self._collect_file_paths(current_config)
+            return {
+                "preferences": {
+                    "default_output_language": language,
+                    "default_platform": platform,
+                    **file_paths["preferences"],
+                }
             }
-        }
+        else:
+            return {
+                "preferences": {
+                    "default_output_language": language,
+                    "default_platform": platform,
+                }
+            }
 
     def _collect_file_paths(self, current_config: dict[str, Any] | None = None) -> dict[str, Any]:
         """Collect file paths configuration."""
