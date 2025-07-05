@@ -68,4 +68,10 @@ h3. Acceptance Criteria
 h3. Definition of Done
 * [item 1]
 * [item 2]
+
+Use Jira text formatting when appropriate:
+- For inline code or technical terms: {{monospaced text}}
+- For emphasis: *strong text* or _italic text_
+- For code blocks: {code}code here{code}
+- For file names, commands, or technical references: {{filename.ext}} or {{command}}
 """
