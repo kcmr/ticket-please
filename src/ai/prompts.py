@@ -9,19 +9,35 @@ def get_task_generation_prompt(
     language: str,
 ) -> str:
     """Generate the prompt for task description generation."""
+    # Determine what needs to be generated vs what should be used as-is
+    ac_instruction = ""
+    dod_instruction = ""
+
+    if ac_text.strip():
+        ac_instruction = f"""
+Use the following Acceptance Criteria exactly as provided (do not modify or generate new ones):
+{ac_text}"""
+    else:
+        ac_instruction = "Generate appropriate Acceptance Criteria for this task."
+
+    if dod_text.strip():
+        dod_instruction = f"""
+Use the following Definition of Done exactly as provided (do not modify or generate new ones):
+{dod_text}"""
+    else:
+        dod_instruction = "Generate appropriate Definition of Done items for this task."
+
     return f"""Generate a professional task description in {language} based on the following information:
 
 Task Description: {task_description}
 
-Acceptance Criteria:
-{ac_text}
+{ac_instruction}
 
-Definition of Done:
-{dod_text}
+{dod_instruction}
 
 {format_instructions}
 
-Please generate a clear, professional description that follows the specified format."""
+Please generate a clear, professional description that follows the specified format. When Acceptance Criteria or Definition of Done are provided above, use them exactly as given without modification."""
 
 
 def get_refinement_prompt(current_description: str, refinement_request: str) -> str:
