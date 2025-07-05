@@ -22,7 +22,8 @@ TicketPlease is a command-line tool that helps developers and engineers generate
 ### Prerequisites
 
 - Python 3.10 or higher
-- [uv](https://github.com/astral-sh/uv) for dependency management
+- [asdf](https://asdf-vm.com/) for version management
+- [Poetry](https://python-poetry.org/) for dependency management
 
 ### Development Setup
 
@@ -32,15 +33,17 @@ git clone https://github.com/kcmr/ticket-please.git
 cd ticket-please
 ```
 
-2. Setup the development environment:
+2. Install Python and Poetry using asdf:
+```bash
+asdf install
+```
+
+3. Setup the development environment:
 ```bash
 make setup
 ```
 
-3. Install the package in development mode:
-```bash
-make dev-install
-```
+This will install all dependencies and set up pre-commit hooks automatically.
 
 ## Usage
 
@@ -76,13 +79,14 @@ Configuration is stored in `~/.config/ticketplease/config.toml`.
 # Setup development environment
 make setup
 
+# Install pre-commit hooks
+make install-hooks
+
 # Format code
 make format
 
 # Lint code
 make lint
-
-
 
 # Run tests
 make test
@@ -95,6 +99,21 @@ make check
 
 # Clean build artifacts
 make clean
+```
+
+### Pre-commit Hooks
+
+The project uses pre-commit hooks to ensure code quality:
+
+- **Code formatting**: Automatically formats code with ruff
+- **Linting**: Checks code style and potential issues
+- **Commit message validation**: Ensures commit messages follow conventional commits format
+- **File checks**: Removes trailing whitespace, fixes end-of-file issues, etc.
+
+Hooks are automatically installed when you run `make setup`. To manually install them:
+
+```bash
+make install-hooks
 ```
 
 ## Contributing

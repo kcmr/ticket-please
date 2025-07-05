@@ -4,7 +4,8 @@ Este documento define las directrices técnicas, los estándares de codificació
 
 ## Gestión de Dependencias
 
-- Se utilizará uv para la gestión del entorno virtual y la instalación de dependencias
+- Se utilizará Poetry para la gestión del entorno virtual y la instalación de dependencias
+- Se utilizará asdf para la gestión de versiones de Python y Poetry
 - Se utilizará el archivo pyproject.toml como única fuente de verdad para la configuración del proyecto
 
 ## Calidad de código y estilo
