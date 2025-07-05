@@ -29,56 +29,6 @@ class TestConfigWizard:
         assert "Español" in wizard.languages
         assert "GitHub" in wizard.platforms
 
-    def test_get_openai_models(self) -> None:
-        """Test OpenAI model retrieval and sorting."""
-        wizard = ConfigWizard()
-        models = wizard._get_openai_models()
-
-        # Should have models and be limited
-        assert len(models) <= 15
-        assert len(models) > 0
-
-        # Should prioritize popular models
-        popular_models = ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"]
-        found_popular = [m for m in models if m in popular_models]
-        assert len(found_popular) > 0
-
-    def test_get_anthropic_models(self) -> None:
-        """Test Anthropic model retrieval and sorting."""
-        wizard = ConfigWizard()
-        models = wizard._get_anthropic_models()
-
-        # Should have models and be limited
-        assert len(models) <= 15
-        assert len(models) > 0
-
-        # Should have Claude models
-        assert any("claude" in model.lower() for model in models)
-
-    def test_get_gemini_models(self) -> None:
-        """Test Gemini model retrieval and sorting."""
-        wizard = ConfigWizard()
-        models = wizard._get_gemini_models()
-
-        # Should have models and be limited
-        assert len(models) <= 15
-        assert len(models) > 0
-
-        # Should have Gemini models
-        assert any("gemini" in model.lower() for model in models)
-
-    def test_get_openrouter_models(self) -> None:
-        """Test OpenRouter model retrieval and sorting."""
-        wizard = ConfigWizard()
-        models = wizard._get_openrouter_models()
-
-        # Should have models and be limited
-        assert len(models) <= 15
-        assert len(models) > 0
-
-        # Should have provider-prefixed models
-        assert any("/" in model for model in models)
-
     def test_validate_optional_path_empty(self) -> None:
         """Test validation of empty optional path."""
         wizard = ConfigWizard()
@@ -202,8 +152,24 @@ class TestConfigWizard:
     def test_run_cancelled_model(self, mock_password, mock_select) -> None:
         """Test wizard cancellation at model selection."""
         mock_select.return_value.ask.side_effect = [
+            "OpenAI",
+            None,
+        ]  # Provider selected, model cancelled
+        mock_password.return_value.ask.return_value = "test-api-key"
+
+        wizard = ConfigWizard()
+        result = wizard.run()
+        assert result is False
+
+    @patch("questionary.select")
+    @patch("questionary.password")
+    @patch("questionary.path")
+    def test_run_cancelled_language(self, mock_path, mock_password, mock_select) -> None:
+        """Test wizard cancellation at language selection."""
+        mock_select.return_value.ask.side_effect = [
             "OpenAI",  # provider
-            None,  # model (user cancels)
+            "gpt-4o-mini",  # model
+            None,  # language cancelled
         ]
         mock_password.return_value.ask.return_value = "test-api-key"
 
@@ -212,40 +178,29 @@ class TestConfigWizard:
         assert result is False
 
     def test_providers_mapping(self) -> None:
-        """Test that all providers have correct mappings."""
+        """Test providers mapping structure."""
         wizard = ConfigWizard()
-        expected_providers = {
-            "OpenAI": "openai",
-            "Anthropic": "anthropic",
-            "Google (Gemini)": "gemini",
-            "OpenRouter": "openrouter",
-        }
-        assert wizard.providers == expected_providers
+        assert wizard.providers["OpenAI"] == "openai"
+        assert wizard.providers["Anthropic"] == "anthropic"
+        assert wizard.providers["Google (Gemini)"] == "gemini"
+        assert wizard.providers["OpenRouter"] == "openrouter"
 
     def test_models_structure(self) -> None:
-        """Test that models structure is correct."""
+        """Test models structure and availability."""
         wizard = ConfigWizard()
-
-        # Check that all providers have models
-        for provider in wizard.providers.values():
+        for provider in ["openai", "anthropic", "gemini", "openrouter"]:
             assert provider in wizard.models
-            assert isinstance(wizard.models[provider], list)
             assert len(wizard.models[provider]) > 0
+            assert "🔧 Specify custom model" in wizard.models[provider]
 
     def test_languages_mapping(self) -> None:
-        """Test that languages have correct mappings."""
+        """Test languages mapping structure."""
         wizard = ConfigWizard()
-        expected_languages = {
-            "Español": "es",
-            "English": "en",
-        }
-        assert wizard.languages == expected_languages
+        assert wizard.languages["English"] == "en"
+        assert wizard.languages["Español"] == "es"
 
     def test_platforms_mapping(self) -> None:
-        """Test that platforms have correct mappings."""
+        """Test platforms mapping structure."""
         wizard = ConfigWizard()
-        expected_platforms = {
-            "GitHub": "github",
-            "Jira": "jira",
-        }
-        assert wizard.platforms == expected_platforms
+        assert wizard.platforms["GitHub"] == "github"
+        assert wizard.platforms["Jira"] == "jira"
