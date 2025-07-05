@@ -58,6 +58,9 @@ tkp --version
 
 # Show help
 tkp --help
+
+# Configure settings
+tkp config
 ```
 
 ### Configuration
