@@ -2,7 +2,8 @@
 
 ## 1. Overview del Proyecto
 
-**Nombre provisional:** TicketPlease (tkp)
+**Nombre provisional:** TicketPlease (tk);
+
 
 **Elevator Pitch:** TicketPlease es una herramienta de línea de comandos (CLI) desarrollada en Python que utiliza IA para ayudar a desarrolladores e ingenieros a generar descripciones de tareas estandarizadas y de alta calidad para plataformas como Jira y GitHub. A través de un flujo interactivo, la herramienta recopila los requisitos clave y produce un texto formateado listo para ser copiado y pegado, acelerando el proceso de creación de tickets y mejorando la claridad de las tareas.
 
@@ -112,18 +113,18 @@ h3. Definition of Done
 
 ### 5.1. Primer Uso (Onboarding)
 
-- El usuario ejecuta ticketplease.
+- El usuario ejecuta `tk config`.
 - La herramienta detecta que no existe ~/.config/ticketplease/config.toml.
 - Inicia el asistente de configuración:
   - Pregunta 1: "Elige tu proveedor de IA: [OpenAI, Anthropic, Gemini, OpenRouter]".
   - Pregunta 2: "Por favor, introduce tu API Key".
   - Pregunta 3: "Elige un modelo de la lista: [gpt-4o-mini, claude-3-sonnet..., etc.]" (La lista se obtiene vía litellm).
   - Guarda la configuración en el archivo config.toml.
-  - Procede al flujo de uso regular.
+  - El usuario puede ejecutar `tk please` para crear tareas.
 
 ### 5.2. Uso Regular
 
-- El usuario ejecuta ticketplease en su terminal (comando tkp).
+- El usuario ejecuta `tk please` en su terminal.
 - La herramienta carga las preferencias desde config.toml.
 - Pregunta 1: ¿Qué hay que hacer? (Describe la tarea brevemente)
 - Pregunta 2: Plataforma de destino: [GitHub | Jira] (pre-seleccionada según la preferencia).
@@ -142,13 +143,17 @@ h3. Definition of Done
 
 ```bash
 # Inicia el flujo interactivo principal para crear una nueva tarea
-\$ tkp
+\$ tk please
+
+# Muestra la ayuda (comportamiento por defecto sin argumentos)
+\$ tk
 
 # Muestra la versión de la herramienta
-\$ tkp --version
+\$ tk --version
+\$ tk -v
 
 # Permite gestionar la configuración
-\$ tkp config
+\$ tk config
 # Opciones interactivas para:
 # - Ver la configuración actual
 # - Cambiar la API Key o el proveedor

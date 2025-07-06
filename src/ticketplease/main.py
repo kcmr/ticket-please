@@ -31,16 +31,15 @@ def run_config(is_update: bool = False) -> None:
             console.print(f"\n❌ Configuration error: {e}")
             return
 
-        # After successful initial setup, start task generation
-        if not is_update:
-            run_task_generation()
+        # After successful initial setup, inform user about next steps
+        console.print()
+        console.print("✅ Configuration completed successfully!")
+        console.print()
+        console.print("You can now create tasks with [bold cyan]tk please[/bold cyan]")
+        console.print()
         return
 
-    # If this is not an update, start task generation
-    if not is_update:
-        run_task_generation()
-        return
-
+    # Configuration exists, run update
     try:
         wizard = ConfigWizard()
         wizard.run_update()
@@ -55,5 +54,16 @@ def run_config(is_update: bool = False) -> None:
 def run_task_generation() -> None:
     """Run the task generation flow."""
     config = Config()
+
+    # Check if configuration exists
+    if config.is_first_run():
+        console.print("[red]❌ No configuration found.[/red]")
+        console.print()
+        console.print(
+            "Please run [bold cyan]tk config[/bold cyan] first to set up your preferences."
+        )
+        console.print()
+        return
+
     generator = TaskGenerator(config)
     generator.generate_task()

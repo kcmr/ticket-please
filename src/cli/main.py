@@ -3,12 +3,12 @@
 import typer
 from rich.console import Console
 
-from ticketplease.main import run_config
+from ticketplease.main import run_config, run_task_generation
 
 from . import __version__
 
 app = typer.Typer(
-    name="tkp",
+    name="tk",
     help="CLI assistant for generating task descriptions using AI",
     add_completion=False,
 )
@@ -16,22 +16,29 @@ console = Console()
 
 
 @app.command()
-def version() -> None:
-    """Show the version of TicketPlease."""
-    console.print(f"TicketPlease version {__version__}")
+def please() -> None:
+    """Start the interactive task generation flow."""
+    run_task_generation()
 
 
 @app.command()
 def config() -> None:
-    """Modify your TicketPlease configuration."""
+    """Configure your TicketPlease settings."""
     run_config(is_update=True)
 
 
 @app.callback(invoke_without_command=True)
-def main(ctx: typer.Context) -> None:
-    """Start the interactive task generation flow."""
+def main(
+    ctx: typer.Context,
+    version: bool = typer.Option(False, "--version", "-v", help="Show version and exit"),
+) -> None:
+    """Show help when no command is provided."""
+    if version:
+        console.print(f"TicketPlease version {__version__}")
+        raise typer.Exit()
+
     if ctx.invoked_subcommand is None:
-        run_config(is_update=False)
+        console.print(ctx.get_help())
 
 
 if __name__ == "__main__":
