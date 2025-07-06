@@ -31,6 +31,7 @@ class TestIntegration:
         """Test successful task generation flow."""
         # Setup mocks
         mock_config = MagicMock()
+        mock_config.is_first_run.return_value = False  # Configuration exists
         mock_config_class.return_value = mock_config
 
         mock_generator = MagicMock()
@@ -42,6 +43,7 @@ class TestIntegration:
 
         # Verify calls
         mock_config_class.assert_called_once()
+        mock_config.is_first_run.assert_called_once()
         mock_generator_class.assert_called_once_with(mock_config)
         mock_generator.generate_task.assert_called_once()
 
@@ -51,6 +53,7 @@ class TestIntegration:
         """Test task generation flow when generation fails."""
         # Setup mocks
         mock_config = MagicMock()
+        mock_config.is_first_run.return_value = False  # Configuration exists
         mock_config_class.return_value = mock_config
 
         mock_generator = MagicMock()
@@ -62,18 +65,36 @@ class TestIntegration:
 
         # Verify calls
         mock_config_class.assert_called_once()
+        mock_config.is_first_run.assert_called_once()
         mock_generator_class.assert_called_once_with(mock_config)
         mock_generator.generate_task.assert_called_once()
+
+    @patch("ticketplease.main.Config")
+    @patch("ticketplease.main.console")
+    def test_run_task_generation_no_config(self, mock_console, mock_config_class):
+        """Test task generation flow when no configuration exists."""
+        # Setup mocks
+        mock_config = MagicMock()
+        mock_config.is_first_run.return_value = True  # No configuration
+        mock_config_class.return_value = mock_config
+
+        # Run the function
+        run_task_generation()
+
+        # Verify calls
+        mock_config_class.assert_called_once()
+        mock_config.is_first_run.assert_called_once()
+
+        # Verify console messages were printed
+        assert mock_console.print.call_count >= 3  # Should print error and instruction messages
 
     @patch("ticketplease.generator.TaskDataCollector")
     @patch("ticketplease.generator.AIService")
     @patch("ticketplease.generator.copy_to_clipboard")
-    @patch("questionary.text")
     @patch("questionary.select")
     def test_complete_flow_manual_input(
         self,
         mock_select,
-        mock_text,
         mock_copy,
         mock_ai_service_class,
         mock_collector_class,

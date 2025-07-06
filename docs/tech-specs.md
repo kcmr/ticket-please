@@ -1,6 +1,6 @@
 # Especificaciones Técnicas
 
-Este documento define las directrices técnicas, los estándares de codificación y el flujo de trabajo de desarrollo para el proyecto Ticket Please. El objetivo es garantizar un código consistente, legible, mantenible y de alta calidad. El nombre del paquete en PyPI será ticketplease y el comando de la CLI será tkp.
+Este documento define las directrices técnicas, los estándares de codificación y el flujo de trabajo de desarrollo para el proyecto Ticket Please. El objetivo es garantizar un código consistente, legible, mantenible y de alta calidad. El nombre del paquete en PyPI será ticketplease y el comando de la CLI será tk.
 
 ## Gestión de Dependencias
 

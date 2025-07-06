@@ -5,21 +5,26 @@ from unittest.mock import patch
 from ticketplease.main import run_config
 
 
-def test_run_wizard_with_existing_config():
-    """Test that run_wizard does nothing when config already exists."""
+def test_run_config_with_existing_config():
+    """Test that run_config runs update wizard when config exists."""
     with (
-        patch("ticketplease.main.console") as mock_console,
         patch("ticketplease.main.Config") as mock_config_class,
+        patch("ticketplease.main.ConfigWizard") as mock_wizard_class,
     ):
         # Mock config to simulate existing valid configuration
         mock_config = mock_config_class.return_value
         mock_config.is_first_run.return_value = False
         mock_config.is_configured.return_value = True
 
-        run_config(is_update=False)
+        # Mock wizard
+        mock_wizard = mock_wizard_class.return_value
 
-        # Verify that no console.print was called (no wizard needed)
-        assert mock_console.print.call_count == 0
+        # Call with is_update=True (this is what happens when user runs 'tk config')
+        run_config(is_update=True)
+
+        # Verify that wizard update was called
+        mock_wizard_class.assert_called_once()
+        mock_wizard.run_update.assert_called_once()
 
 
 def test_run_wizard_first_run():
