@@ -2,6 +2,9 @@
 
 CLI assistant for generating standardized task descriptions using AI.
 
+![Demo](./images/tk-please-demo.gif)
+
+
 ## Overview
 
 TicketPlease is a command-line tool that helps developers and engineers generate high-quality, standardized task descriptions for platforms like Jira and GitHub using AI. It provides an interactive flow to collect key requirements and produces formatted text ready to copy and paste.
