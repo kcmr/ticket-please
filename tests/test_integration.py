@@ -91,7 +91,6 @@ class TestIntegration:
     @patch("ticketplease.generator.TaskDataCollector")
     @patch("ticketplease.generator.AIService")
     @patch("ticketplease.generator.copy_to_clipboard")
-    @patch("questionary.text")
     @patch("questionary.select")
     def test_complete_flow_manual_input(
         self,
