@@ -2,7 +2,7 @@
 
 ## 1. Overview del Proyecto
 
-**Nombre provisional:** TicketPlease (tk);
+**Nombre provisional:** TicketPlease (tk)
 
 
 **Elevator Pitch:** TicketPlease es una herramienta de línea de comandos (CLI) desarrollada en Python que utiliza IA para ayudar a desarrolladores e ingenieros a generar descripciones de tareas estandarizadas y de alta calidad para plataformas como Jira y GitHub. A través de un flujo interactivo, la herramienta recopila los requisitos clave y produce un texto formateado listo para ser copiado y pegado, acelerando el proceso de creación de tickets y mejorando la claridad de las tareas.
