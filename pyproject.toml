@@ -58,7 +58,6 @@ version_variables = [
     "src/ticketplease/__init__.py:__version__",
     "src/cli/__init__.py:__version__"
 ]
-build_command = "poetry build"
 dist_path = "dist/"
 upload_to_vcs_release = true
 upload_to_pypi = false
