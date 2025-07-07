@@ -11,7 +11,7 @@ TicketPlease is a command-line tool that helps developers and engineers generate
 
 ## Features
 
-- **Interactive Guided Flow**: Step-by-step questions to collect all necessary information
+- **Interactive Guided Flow**: Step-by-step questions to collect all necessary information, including multiline support for detailed task descriptions
 - **AI-Powered Content Generation**: Uses LLMs to process user responses and generate complete, well-formatted descriptions
 - **Multi-Platform Support**: Generates output in Markdown for GitHub or Jira text markup format
 - **Configurable Setup**: Interactive wizard guides you through API key and AI model configuration when running `tk config` for the first time or if no configuration file exists

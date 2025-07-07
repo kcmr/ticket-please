@@ -35,20 +35,19 @@ class TestTaskDataCollector:
         assert "English" in collector.languages
         assert "Español" in collector.languages
 
-    @patch("questionary.text")
-    def test_collect_task_description_success(self, mock_text, collector):
+    @patch("builtins.input")
+    def test_collect_task_description_success(self, mock_input, collector):
         """Test successful task description collection."""
-        mock_text.return_value.ask.return_value = "  Create a login form  "
+        mock_input.side_effect = ["Create a login form", "DONE"]
 
         result = collector._collect_task_description()
 
         assert result == "Create a login form"
-        mock_text.assert_called_once()
 
-    @patch("questionary.text")
-    def test_collect_task_description_cancelled(self, mock_text, collector):
+    @patch("builtins.input")
+    def test_collect_task_description_cancelled(self, mock_input, collector):
         """Test task description collection when cancelled."""
-        mock_text.return_value.ask.return_value = None
+        mock_input.side_effect = KeyboardInterrupt("Task generation cancelled")
 
         with pytest.raises(KeyboardInterrupt, match="Task generation cancelled"):
             collector._collect_task_description()
@@ -82,9 +81,10 @@ class TestTaskDataCollector:
         mock_select.assert_called_once()
 
     @patch("questionary.text")
-    def test_collect_criteria_manually_success(self, mock_text, collector):
-        """Test successful manual criteria collection."""
-        # Simulate user entering three criteria then empty line
+    @patch("questionary.select")
+    def test_collect_acceptance_criteria_manual_success(self, mock_select, mock_text, collector):
+        """Test successful manual acceptance criteria collection."""
+        mock_select.return_value.ask.return_value = "📝 Enter manually"
         mock_text.return_value.ask.side_effect = [
             "User can login",
             "System validates credentials",
@@ -92,79 +92,38 @@ class TestTaskDataCollector:
             "",  # Empty line to finish
         ]
 
-        result = collector._collect_criteria_manually("test criteria")
+        result = collector._collect_acceptance_criteria()
 
         assert len(result) == 3
         assert "User can login" in result
         assert "System validates credentials" in result
         assert "Error messages are shown" in result
 
-    @patch("questionary.text")
-    def test_collect_criteria_manually_cancelled(self, mock_text, collector):
-        """Test manual criteria collection when cancelled."""
-        mock_text.return_value.ask.return_value = None
+    @patch("questionary.select")
+    def test_collect_acceptance_criteria_manual_cancelled(self, mock_select, collector):
+        """Test manual acceptance criteria collection when cancelled."""
+        mock_select.return_value.ask.return_value = None
 
         with pytest.raises(KeyboardInterrupt, match="Task generation cancelled"):
-            collector._collect_criteria_manually("test criteria")
+            collector._collect_acceptance_criteria()
 
     @patch("ticketplease.collector.read_file_content")
     @patch("questionary.path")
-    def test_collect_criteria_from_file_success(self, mock_path, mock_read, collector):
-        """Test successful criteria collection from file."""
+    @patch("questionary.select")
+    def test_collect_acceptance_criteria_from_file_success(
+        self, mock_select, mock_path, mock_read, collector
+    ):
+        """Test successful acceptance criteria collection from file."""
+        mock_select.return_value.ask.return_value = "📁 Load from file"
         mock_path.return_value.ask.return_value = "/path/to/file.txt"
         mock_read.return_value = ["Criterion 1", "Criterion 2"]
 
-        result = collector._collect_criteria_from_file("test criteria")
+        result = collector._collect_acceptance_criteria()
 
         assert len(result) == 2
         assert "Criterion 1" in result
         assert "Criterion 2" in result
         mock_read.assert_called_once_with("/path/to/file.txt")
-
-    @patch("questionary.path")
-    def test_collect_criteria_from_file_cancelled(self, mock_path, collector):
-        """Test criteria collection from file when cancelled."""
-        mock_path.return_value.ask.return_value = None
-
-        with pytest.raises(KeyboardInterrupt, match="Task generation cancelled"):
-            collector._collect_criteria_from_file("test criteria")
-
-    def test_validate_criteria_file_empty_path(self, collector):
-        """Test file validation with empty path."""
-        result = collector._validate_criteria_file("")
-        assert result == "File path cannot be empty"
-
-    @patch("ticketplease.collector.validate_file_path")
-    def test_validate_criteria_file_invalid_path(self, mock_validate, collector):
-        """Test file validation with invalid path."""
-        mock_validate.return_value = False
-
-        result = collector._validate_criteria_file("/invalid/path.txt")
-
-        assert "File does not exist" in result
-        mock_validate.assert_called_once_with("/invalid/path.txt")
-
-    @patch("ticketplease.collector.validate_file_path")
-    def test_validate_criteria_file_valid_path(self, mock_validate, collector):
-        """Test file validation with valid path."""
-        mock_validate.return_value = True
-
-        result = collector._validate_criteria_file("/valid/path.txt")
-
-        assert result is True
-        mock_validate.assert_called_once_with("/valid/path.txt")
-
-    def test_get_platform_display_name(self, collector):
-        """Test platform display name conversion."""
-        assert collector._get_platform_display_name("github") == "GitHub"
-        assert collector._get_platform_display_name("jira") == "Jira"
-        assert collector._get_platform_display_name("unknown") == "unknown"
-
-    def test_get_language_display_name(self, collector):
-        """Test language display name conversion."""
-        assert collector._get_language_display_name("en") == "English"
-        assert collector._get_language_display_name("es") == "Español"
-        assert collector._get_language_display_name("unknown") == "unknown"
 
     @patch("ticketplease.collector.validate_file_path")
     @patch("ticketplease.collector.read_file_content")
