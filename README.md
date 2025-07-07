@@ -39,6 +39,12 @@ This flexibility ensures that you can always utilize the latest or most suitable
 - [asdf](https://asdf-vm.com/) for version management
 - [Poetry](https://python-poetry.org/) for dependency management
 
+### Installation using pip
+
+```bash
+pip install ticketplease
+```
+
 ### Development Setup
 
 1. Clone the repository:
