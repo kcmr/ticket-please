@@ -1,3 +1,5 @@
 """CLI module for TicketPlease."""
 
-__version__ = "0.1.0"  # managed by semantic-release
+from importlib.metadata import version as get_version
+
+__version__ = get_version("ticketplease")
