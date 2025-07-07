@@ -115,8 +115,10 @@ class TaskGenerator:
         )
         console.print()
 
-        # Display the content with markdown syntax highlighting
-        syntax = Syntax(description, "markdown", theme="monokai", line_numbers=False, padding=2)
+        # Display the content with markdown syntax highlighting and word wrapping
+        syntax = Syntax(
+            description, "markdown", theme="monokai", line_numbers=False, padding=2, word_wrap=True
+        )
         console.print(syntax)
         console.print("\n" + "=" * 80)
 

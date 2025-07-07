@@ -297,3 +297,19 @@ class TestTaskGenerator:
             assert result is True
             mock_refine.assert_called_once()
             mock_copy.assert_called_once_with("Refined")
+
+    @patch("ticketplease.generator.console")
+    @patch("ticketplease.generator.Syntax")
+    def test_display_result_uses_word_wrap(self, mock_syntax, mock_console, generator):
+        """Test that _display_result uses word_wrap=True for better text formatting."""
+        description = "This is a very long line that should wrap properly in the terminal"
+
+        generator._display_result(description)
+
+        # Verify that Syntax was called with word_wrap=True
+        mock_syntax.assert_called_once_with(
+            description, "markdown", theme="monokai", line_numbers=False, padding=2, word_wrap=True
+        )
+
+        # Verify that the syntax object was printed
+        mock_console.print.assert_called()
