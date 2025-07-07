@@ -61,7 +61,6 @@ branch = "main"
 commit_message = "chore(release): {version} [skip ci]"
 remove_dist = true
 upload_to_pypi = false
-publish = true
 version_source = "tag"
 tag_format = "v{version}"
 
