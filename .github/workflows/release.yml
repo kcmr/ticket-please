@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -53,11 +52,9 @@ jobs:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Build package
-        if: steps.release.outputs.released == 'true'
+        if: ${{ steps.release.outputs.released == 'true' }}
         run: poetry build
 
       - name: Publish to PyPI
-        if: steps.release.outputs.released == 'true'
+        if: ${{ steps.release.outputs.released == 'true' }}
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}

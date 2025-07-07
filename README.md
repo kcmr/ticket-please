@@ -2,7 +2,7 @@
 
 CLI assistant for generating standardized task descriptions using AI.
 
-![Demo](./images/tk-please-demo.gif)
+![Demo](https://github.com/kcmr/ticket-please/images/tk-please-demo.gif)
 
 
 ## Overview
