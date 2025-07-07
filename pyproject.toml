@@ -49,8 +49,21 @@ types-toml = "^0.10.8.20240310"
 tk = "cli.main:app"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core", "python-semantic-release"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.semantic_release]
+version_variables = [
+    "src/ticketplease/__init__.py:__version__",
+    "src/cli/__init__.py:__version__"
+]
+branch = "main"
+commit_message = "chore(release): {version} [skip ci]"
+remove_dist = true
+upload_to_pypi = true
+publish = true
+version_source = "tag"
+tag_format = "v{version}"
 
 [tool.ruff]
 target-version = "py310"
