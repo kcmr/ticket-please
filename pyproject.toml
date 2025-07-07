@@ -59,7 +59,6 @@ upload_to_vcs_release = true
 upload_to_pypi = false
 remove_dist = false
 commit_message = "chore(release): {version} [skip ci]"
-commit_parser = "conventional"
 tag_format = "v{version}"
 major_on_zero = false
 changelog_file = "CHANGELOG.md"
