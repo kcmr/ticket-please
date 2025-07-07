@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ticketplease"
-version = "0.1.0"
+version = "0.1.1"
 description = "CLI assistant for generating standardized task descriptions using AI"
 authors = ["Kus Cámara <kus.camara@gmail.com>"]
 license = "MIT"
