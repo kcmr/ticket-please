@@ -109,6 +109,9 @@ make format
 # Lint code
 make lint
 
+# Lint and fix code
+make lint-fix
+
 # Run tests
 make test
 

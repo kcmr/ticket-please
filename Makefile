@@ -1,4 +1,4 @@
-.PHONY: help setup format lint test check clean clean-all install dev-install install-hooks
+.PHONY: help setup format lint lint-fix test check clean clean-all install dev-install install-hooks
 
 help: ## Show this help message
 	@echo "Available commands:"
@@ -23,6 +23,9 @@ format: ## Format code with ruff
 	poetry run ruff format src/ tests/
 
 lint: ## Lint code with ruff
+	poetry run ruff check src/ tests/
+
+lint-fix: ## Lint and fix code with ruff
 	poetry run ruff check --fix src/ tests/
 
 test: ## Run tests with pytest
