@@ -1,8 +1,11 @@
 # TicketPlease
 
-CLI assistant for generating standardized task descriptions using AI.
+[![PyPI version](https://badge.fury.io/py/ticketplease.svg)](https://pypi.org/project/ticketplease/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-![Demo](https://github.com/kcmr/ticket-please/images/tk-please-demo.gif)
+CLI assistant for generating standardized GitHub and Jira task descriptions using AI.
+
+![Demo](https://raw.githubusercontent.com/kcmr/ticket-please/main/images/tk-please-demo.gif)
 
 
 ## Overview
