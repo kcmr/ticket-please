@@ -9,6 +9,7 @@ on:
       - 'pyproject.toml'
       - 'Makefile'
       - '.github/workflows/pr-validation.yml'
+  workflow_dispatch:
 
 jobs:
   validate:
