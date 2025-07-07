@@ -61,16 +61,43 @@ class TaskDataCollector:
         }
 
     def _collect_task_description(self) -> str:
-        """Collect task description from user."""
-        task_description = questionary.text(
-            "What needs to be done? (Describe the task briefly):",
-            validate=lambda x: bool(x.strip()) or "Task description cannot be empty",
-        ).ask()
+        """Collect task description from user using multiline input."""
+        task_description = self._collect_multiline_input()
 
         if not task_description:
             raise KeyboardInterrupt("Task generation cancelled")
 
         return task_description.strip()
+
+    def _collect_multiline_input(self) -> str:
+        """Collect multiline input from user using DONE keyword to finish."""
+        console.print("\n[bold]What needs to be done? (Describe the task in detail)[/bold]")
+        console.print("[dim]• Enter your description (multiple lines supported)[/dim]")
+        console.print("[dim]• Type 'DONE' on a new line to finish[/dim]")
+        console.print("[dim]• Press Ctrl+C to cancel[/dim]")
+        console.print()
+
+        lines = []
+        try:
+            while True:
+                line = input()
+                if line.strip().upper() == "DONE":
+                    break
+                lines.append(line)
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt("Task generation cancelled") from None
+        except EOFError:
+            # Handle Ctrl+D gracefully
+            console.print("\n[yellow]Input cancelled[/yellow]")
+            raise KeyboardInterrupt("Task generation cancelled") from None
+
+        result = "\n".join(lines).strip()
+
+        if not result:
+            console.print("[red]Task description cannot be empty[/red]")
+            return self._collect_multiline_input()
+
+        return result
 
     def _collect_platform(self) -> str:
         """Collect target platform from user."""
